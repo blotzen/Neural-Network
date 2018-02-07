@@ -57,6 +57,10 @@ public abstract class Node {
 
       double weightOffset = -1 * getError() * MathExtends.sigmoidFirstDerivative(sumWeightedOutput) * edge.prevNode.getOutput();
 
+      //if (edge.prevNode instanceof InputNode) {
+      //  System.out.println("asdfasdf");
+      //}
+
       edge.weight = edge.weight - App.learningRate * weightOffset;
     }
   }

@@ -1,10 +1,10 @@
 public class HiddenNode extends Node {
 
-  public HiddenNode(final String ids) {
+  public HiddenNode(final String ids, int nodesPrev, int nodesSub) {
     super(ids);
 
-    previousEdges = new Edge[App.nodesPerLayer];
-    subsequentEdges = new Edge[App.nodesPerLayer];
+    previousEdges = new Edge[nodesPrev];
+    subsequentEdges = new Edge[nodesSub];
   }
 
   @Override

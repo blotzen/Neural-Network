@@ -1,10 +1,16 @@
 public class App {
 
-  static int netDepth = 0;
-  static int nodesPerLayer = 0;
-  static double learningRate = 0.1;
+  // deep feed forward?
 
-  static Node[][] nodes;
+  static int netDepth = 3;
+  static int nodesHidden = 3;
+  static int nodesInput = 5;
+  static int nodesOutput = 2;
+
+  static double learningRate = 0.5;
+
+  // partly instantiated jagged array of Nodes
+  static Node[][] nodes = new Node[netDepth][];
 
   static String[] inputs;
   static String[] targets;
@@ -12,94 +18,125 @@ public class App {
 
   public static void main(final String[] args) {
 
-    netDepth = Integer.parseInt(args[0]);
-    nodesPerLayer = Integer.parseInt(args[1]);
-
     // array which holds all inputs
     //inputs = java.util.Arrays.copyOfRange(args, 2, args.length - 1);
-    inputs = new String[3];
+    inputs = new String[5];
     inputs[0] = "0.8";
     inputs[1] = "0.2";
-    inputs[2] = "0.7";
+    inputs[2] = "0.4";
+    inputs[3] = "0.1";
+    inputs[4] = "0.3";
+
 
     // array which holds all target values
     // still missing good implementation
-    targets = new String[3];
-    targets[0] = "0.1";
+    targets = new String[2];
+    targets[0] = "0.3";
     targets[1] = "0.8";
-    targets[2] = "0.6";
 
 
-    if (inputs.length == nodesPerLayer) {
-      nodes = generateNodes(inputs, targets);
-      generateEdges();
+    if (inputs.length == nodesInput && targets.length == nodesOutput) {
 
-      for (int i = 0; i < 1000; i++) {
+      generateInputNodes(inputs);
+      generateHiddenNodes();
+      generateOutputNodes(targets);
+
+      for (int i = 0; i < netDepth - 1; i++) {
+        generateEdges(i);
+      }
+
+      for (int i = 0; i < 2000; i++) {
         think();
       }
 
       printResult();
     } else {
-      System.out.println("Inputs are not matching the nodes per layer count!\nNo operation executed!");
+      System.out.println("Input count not matching nodes count in the first layer!\nNo operation executed!");
     }
   }
 
 
-  private static Node[][] generateNodes(String[] inputs, String[] targets) {
+  //region Generates all Nodes
+  private static void generateInputNodes(final String[] inputs) {
 
-    Node[][] nodes = new Node[netDepth][nodesPerLayer];
+    nodes[0] = new Node[nodesInput];
 
-    for (int i = 0; i < netDepth; i++) {
-      for (int j = 0; j < nodesPerLayer; j++) {
-
-        if (i == 0) {
-          Node inputNode = new InputNode(String.format("%d%d", i, j));
-          // sets the input from the array to the node
-          inputNode.input = Double.parseDouble(inputs[j]);
-          nodes[i][j] = inputNode;
-        } else if (i > 0 && i < netDepth - 1) {
-          nodes[i][j] = new HiddenNode(String.format("%d%d", i, j));
-        } else {                                                    // assigns target values to output nodes
-          nodes[i][j] = new OutputNode(String.format("%d%d", i, j), Double.parseDouble(targets[j]));
-        }
-
-        //System.out.print(nodes[i][j].ids + " ");
-      }
-
-      //System.out.println();
+    for (int i = 0; i < nodesInput; i++) {
+      nodes[0][i] = new InputNode(String.format("0%d", i), Double.parseDouble(inputs[i]));
     }
-
-    return nodes;
   }
 
+  private static void generateHiddenNodes() {
 
-  private static void generateEdges() {
+    for (int i = 1; i < netDepth - 1; i++) {
 
-    for (int i = 0; i < netDepth; i++) {
-      for (int j = 0; j < nodesPerLayer; j++) {
-        for (int k = 0; k < nodesPerLayer; k++) {
+      nodes[i] = new Node[nodesHidden];
 
-          if (i == 0) {
-            Node inputNode = nodes[i][j];
+      int prevNodes = nodesInput;
+      int subNodes = nodesHidden;
 
-            Node subsequentNode = nodes[i + 1][k];
-            Edge edge = new Edge(inputNode, subsequentNode, Edge.generateWeight());
-            inputNode.subsequentEdges[k] = edge;
-
-            subsequentNode.previousEdges[j] = edge;
-
-          } else if (i > 0 && i < netDepth - 1) {
-            Node hiddenNode = nodes[i][j];
-
-            Node subsequentNode = nodes[i + 1][k];
-            Edge edge = new Edge(hiddenNode, subsequentNode, Edge.generateWeight());
-            hiddenNode.subsequentEdges[k] = edge;
-
-            subsequentNode.previousEdges[j] = edge;
-          }
-        }
-
+      // changes size of previous and subsequent edge arrays
+      if (i > 1) {
+        prevNodes = nodesHidden;
       }
+
+      if (i == netDepth - 2) {
+        subNodes = nodesOutput;
+      }
+
+      for (int j = 0; j < nodesHidden; j++) {
+        nodes[i][j] = new HiddenNode(String.format("%d%d", i, j), prevNodes, subNodes);
+      }
+    }
+  }
+
+  private static void generateOutputNodes(final String[] targets) {
+
+    nodes[netDepth - 1] = new Node[nodesOutput];
+
+    for (int i = 0; i < nodesOutput; i++) {
+      nodes[netDepth - 1][i] = new OutputNode(String.format("%d%d", netDepth - 1, i), Double.parseDouble(targets[i]));
+    }
+  }
+  //endregion
+
+
+  private static void generateEdges(int layerId) {
+
+    int nodesLayer = nodesInput;
+    int nodesNextLayer = nodesHidden;
+
+    if (layerId > 0 && layerId < netDepth - 1) {
+      nodesLayer = nodesHidden;
+
+      if (layerId == netDepth - 2) {
+        nodesNextLayer = nodesOutput;
+      }
+    }
+
+    for (int j = 0; j < nodesLayer; j++) {
+      for (int k = 0; k < nodesNextLayer; k++) {
+
+        if (layerId == 0) {
+          Node inputNode = nodes[layerId][j];
+
+          Node subsequentNode = nodes[layerId + 1][k];
+          Edge edge = new Edge(inputNode, subsequentNode, Edge.generateWeight());
+          inputNode.subsequentEdges[k] = edge;
+
+          subsequentNode.previousEdges[j] = edge;
+
+        } else if (layerId > 0 && layerId < netDepth - 1) {
+          Node hiddenNode = nodes[layerId][j];
+
+          Node subsequentNode = nodes[layerId + 1][k];
+          Edge edge = new Edge(hiddenNode, subsequentNode, Edge.generateWeight());
+          hiddenNode.subsequentEdges[k] = edge;
+
+          subsequentNode.previousEdges[j] = edge;
+        }
+      }
+
     }
   }
 
@@ -107,40 +144,34 @@ public class App {
   // processes the inputs
   private static void think() {
 
-    // clears old inputs in hidden and output layer
-    for (int i = 1; i < netDepth; i++) {
-      for (int j = 0; j < nodesPerLayer; j++) {
-        nodes[i][j].input = 0.0D;
+    for (Node[] nodes1:nodes) {
+      for (Node node:nodes1) {
+        node.input = 0.0D;
       }
     }
 
+    // clears old inputs in hidden and output layer
     for (int i = 0; i < netDepth; i++) {
-      for (int j = 0; j < nodesPerLayer; j++) {
+      for (Node node:nodes[i]) {
 
-        Node currentNode = nodes[i][j];
-
-        if (currentNode instanceof InputNode || currentNode instanceof HiddenNode) {
-          for (Edge subEdge:currentNode.subsequentEdges) {
+        if (node instanceof InputNode || node instanceof HiddenNode) {
+          for (Edge subEdge:node.subsequentEdges) {
             subEdge.weigh();
           }
-          //currentNode.printSubEdges();
+          //node.printSubEdges();
         }
-
       }
     }
 
     //System.out.println("---------------------------------------------");
 
     for (int i = netDepth - 1; i > 0; i--) {
-      for (int j = 0; j < nodesPerLayer; j++) {
+      for (Node node:nodes[i]) {
 
-        Node currentNode = nodes[i][j];
-
-        currentNode.backpropagate();
-
+        node.backpropagate();
         // draws nothing with size below 2 because of loops set up
-        if (!(currentNode instanceof OutputNode)) {
-          //currentNode.printSubEdges();
+        if (!(node instanceof InputNode)) {
+          //node.printPrevEdges();
         }
 
       }
@@ -149,18 +180,8 @@ public class App {
   }
 
   private static void printResult() {
-    for (int i = 0; i < nodesPerLayer; i++) {
-      System.out.println("Output: " + nodes[netDepth -  1][i].getOutput());
-    }
-  }
-
-  private static void printInfos() {
-    for (int i = 1; i < netDepth; i++) {
-      for (int j = 0; j < nodesPerLayer; j++) {
-        for (int k = 0; k < nodesPerLayer; k++) {
-          System.out.println(nodes[i][j].previousEdges[k].print());
-        }
-      }
+    for (Node node:nodes[netDepth - 1]) {
+      System.out.println("Output: " + node.getOutput());
     }
   }
 }

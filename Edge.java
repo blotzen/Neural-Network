@@ -33,6 +33,6 @@ public class Edge {
       sign = -1;
     }
 
-    return Math.random() * (1 / Math.sqrt(App.nodesPerLayer) * sign);
+    return Math.random() * (1 / Math.sqrt(App.nodesHidden) * sign);
   }
 }

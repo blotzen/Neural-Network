@@ -3,7 +3,7 @@ public class OutputNode extends Node {
     public OutputNode(final String ids, final double targetValue) {
     super(ids);
 
-    previousEdges = new Edge[App.nodesPerLayer];
+    previousEdges = new Edge[App.nodesHidden];
     this.targetValue = targetValue;
   }
 
