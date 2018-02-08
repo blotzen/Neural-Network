@@ -10,22 +10,22 @@ public class Edge {
     this.weight = weight;
   }
 
-  // weights the output of node1 and sets it as input for node2
+  /**
+   * weights the output of node1 and sets it as input for node2
+   */
   public void weigh() {
     subNode.input += prevNode.getOutput() * weight;
   }
-
-  public void backpropagate() {
-
-  }
-
 
   public String print(){
     return String.format("N%s--N%s", prevNode.ids, subNode.ids);
   }
 
-
-  static double generateWeight() {
+  /**
+   * @param nodesInLayer nodes in the layer
+   * @return new weight
+   */
+  static double generateWeight(final int nodesInLayer) {
     int sign = 1;
 
     // generates a random sign for better weight distribution
@@ -33,6 +33,6 @@ public class Edge {
       sign = -1;
     }
 
-    return Math.random() * (1 / Math.sqrt(App.nodesHidden) * sign);
+    return Math.random() * (1 / Math.sqrt(nodesInLayer) * sign);
   }
 }

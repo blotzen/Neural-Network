@@ -1,10 +1,13 @@
 public class OutputNode extends Node {
 
-    public OutputNode(final String ids, final double targetValue) {
+  /**
+   * @param ids String id of the node
+   * @param hiddenNodes amount of hidden nodes in one hidden layer
+   */
+  public OutputNode(final String ids, final int hiddenNodes) {
     super(ids);
 
-    previousEdges = new Edge[App.nodesHidden];
-    this.targetValue = targetValue;
+    previousEdges = new Edge[hiddenNodes];
   }
 
   @Override

@@ -1,13 +1,18 @@
 public class ArrayExtends {
 
-  // multiplies value to each value of array then returns the sum
-  public static double sumMultArray(final double[] array1, final double x) {
-    double sum = 0.0D;
+  // returns index of biggest value, if biggest value is a duplicate, first occurrence is returned
+  public static int getIndexOfBiggestValue(final double[] array) {
 
-    for (int i = 0; i < array1.length; i++) {
-      sum += array1[i] * x;
+    double biggestValue = 0.0D;
+    int biggestValueIndex = 0;
+
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] > biggestValue) {
+        biggestValue = array[i];
+        biggestValueIndex = i;
+      }
     }
 
-    return sum;
+    return biggestValueIndex;
   }
 }

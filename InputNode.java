@@ -1,19 +1,15 @@
 public class InputNode extends Node {
 
-  public InputNode(final String ids, final double input) {
+  /**
+   * @param ids String id of the node
+   * @param hiddenNodes amount of hidden nodes in one hidden layer
+   */
+  public InputNode(final String ids, final int hiddenNodes) {
     super(ids);
 
-    if (App.nodesHidden == 0) {
-      subsequentEdges = new Edge[App.nodesOutput];
-    } else {
-      subsequentEdges = new Edge[App.nodesHidden];
-    }
-
-    this.input = input;
+    subsequentEdges = new Edge[hiddenNodes];
   }
 
   @Override
   public double getOutput() { return input; }
-
-
 }

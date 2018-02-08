@@ -3,31 +3,18 @@ public abstract class Node {
   protected final String ids;
   protected double input;
   protected double error;
-  double targetValue;
+  protected double targetValue;
+
+  protected Edge[] subsequentEdges;
+  protected Edge[] previousEdges;
 
   public Node(final String ids) {
     this.ids = ids;
   }
 
-  protected Edge[] subsequentEdges;
-  protected Edge[] previousEdges;
-
-  public void printPrevEdges() {
-    for (Edge edge:previousEdges) {
-      Visuals.printConnection(edge.prevNode.ids, edge.subNode.ids, edge.weight);
-    }
-  }
-
-
-  public void printSubEdges() {
-    for (Edge edge:subsequentEdges) {
-      Visuals.printConnection(edge.prevNode.ids, edge.subNode.ids, edge.weight);
-    }
-  }
-
+  public abstract double getOutput();
 
   private double getError() {
-
     if (this instanceof OutputNode) {
       return targetValue - getOutput();
     }
@@ -41,26 +28,19 @@ public abstract class Node {
     return error;
   }
 
-
+  /**
+   * sets new weights according to the error of the node
+   */
   public void backpropagate() {
 
-    if (this instanceof InputNode) {
-      return;
-    }
-
     for (Edge edge:previousEdges) {
-      double sumWeightedOutput = 0.0;
+      double sumWeightedOutput = 0.0D;
 
       for (int i = 0; i < previousEdges.length; i++) {
         sumWeightedOutput += previousEdges[i].weight * previousEdges[i].prevNode.getOutput();
       }
 
       double weightOffset = -1 * getError() * MathExtends.sigmoidFirstDerivative(sumWeightedOutput) * edge.prevNode.getOutput();
-
-      //if (edge.prevNode instanceof InputNode) {
-      //  System.out.println("asdfasdf");
-      //}
-
       edge.weight = edge.weight - App.learningRate * weightOffset;
     }
   }
@@ -68,6 +48,4 @@ public abstract class Node {
   public String print() {
     return ids;
   }
-
-  public abstract double getOutput();
 }

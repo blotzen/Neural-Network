@@ -1,8 +1,7 @@
 public class Visuals {
 
 
-
-  public static void printConnection(String node1Name, String node2Name, double weight) {
+  public static void printNodeConnections(String node1Name, String node2Name, double weight) {
     StringBuilder strbldr = new StringBuilder();
     strbldr.append("|----|               |----|\n");
 
@@ -17,5 +16,10 @@ public class Visuals {
   }
 
 
+  public static void printResult(Node[] nodes) {
+    for (Node node:nodes) {
+      System.out.printf("Output: %s%n", node.getOutput());
+    }
+  }
 
 }
