@@ -1,6 +1,6 @@
 public class ArrayExtends {
 
-  public static int indexOfBiggestValue(double[] values) {
+  public static int indexOfBiggestValue(final double[] values) {
     double biggestValue = 0.0D;
     int biggestValueIndex = 0;
 

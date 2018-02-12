@@ -10,25 +10,27 @@ public class App {
   final static String targetPathTrain = "C:\\Users\\Franz\\Desktop\\targetShortAuto.csv";
   final static int targetsLineCountTrain = 100;
 
-  final static String inputPathTest = "C:\\Users\\Franz\\Desktop\\trainShort.csv";
-  final static int inputLineCountTest = 100;
+  final static String inputPathTest = "C:\\Users\\Franz\\Desktop\\testShort.csv";
+  final static int inputLineCountTest = 10;
 
-  final static String targetPathTest = "C:\\Users\\Franz\\Desktop\\trainShort.csv";
-  final static int targetLineCountTest = 100;
+  final static String targetPathTest = "C:\\Users\\Franz\\Desktop\\testShortTargets.csv";
+  final static int targetLineCountTest = 10;
 
-  final static int epochs = 25;
+  final static int epochs = 10;
   /**
   */
 
   public static void main(final String[] args) {
 
-    final int netDepth = 3; // has to be >= 3
+    final int netDepth = 4; // has to be >= 3
     final int inputNodes = 784;
     final int hiddenNodesPerLayer = 200;
     final int outputNodes = 10;
 
     try {
       final Nodes nodesInstance = Nodes.createInstance(netDepth, inputNodes, hiddenNodesPerLayer, outputNodes);
+
+      long startTimeSec = System.currentTimeMillis() / 1000;
 
       System.out.println("Starting training:");
 
@@ -50,8 +52,9 @@ public class App {
         }
       }
 
-      System.out.println("\n");
-      System.out.println("Starting testing:");
+      long endTimeSec = System.currentTimeMillis() / 1000;
+
+      System.out.printf("%nTraining took %d min.%nStarting testing:%n", (endTimeSec - startTimeSec) / 60);
 
       Input inputTest = new Input(inputPathTest, inputLineCountTest, Input.InputType.InputTest);
 
