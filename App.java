@@ -2,15 +2,21 @@ public class App {
 
   /** Important values to set! Deep feed forward neural network in Java
    */
-  final static double learningRate = 0.1;
+  final static double learningRate = 0.2;
 
-  final static String inputPath = "C:\\Users\\Franz\\Desktop\\trainShort.csv";
-  final static int inputLineCount = 100;
+  final static String inputPathTrain = "C:\\Users\\Franz\\Desktop\\trainShort.csv";
+  final static int inputLineCountTrain = 100;
 
-  final static String targetPath = "C:\\Users\\Franz\\Desktop\\targetShortAuto.csv";
-  final static int targetsLineCount = 100;
+  final static String targetPathTrain = "C:\\Users\\Franz\\Desktop\\targetShortAuto.csv";
+  final static int targetsLineCountTrain = 100;
 
-  final static int epochs = 1;
+  final static String inputPathTest = "C:\\Users\\Franz\\Desktop\\trainShort.csv";
+  final static int inputLineCountTest = 100;
+
+  final static String targetPathTest = "C:\\Users\\Franz\\Desktop\\trainShort.csv";
+  final static int targetLineCountTest = 100;
+
+  final static int epochs = 25;
   /**
   */
 
@@ -18,36 +24,57 @@ public class App {
 
     final int netDepth = 3; // has to be >= 3
     final int inputNodes = 784;
-    final int hiddenNodesPerLayer = 100;
+    final int hiddenNodesPerLayer = 200;
     final int outputNodes = 10;
 
     try {
       final Nodes nodesInstance = Nodes.createInstance(netDepth, inputNodes, hiddenNodesPerLayer, outputNodes);
 
-      for (int i = 0; i < epochs; i++) {
-        if (inputLineCount == targetsLineCount) {
-          for (int j = 0; j < inputLineCount; j++) {
+      System.out.println("Starting training:");
 
-            System.out.println(j);
+      for (int i = 1; i <= epochs; i++) {
+        System.out.println("\nEpoch: " + i);
+        if (inputLineCountTrain == targetsLineCountTrain) {
 
-            nodesInstance.updateInputs(new Input(inputPath, inputLineCount, 256).getLine());
-            nodesInstance.updateTargets(new Input(targetPath, targetsLineCount, 10).getLine());
+          Input inputTrain = new Input(inputPathTrain, inputLineCountTrain, Input.InputType.InputTrain);
+          Input inputTarget = new Input(targetPathTrain, targetsLineCountTrain, Input.InputType.TargetTrain);
 
-            think(nodesInstance.nodes);
+          for (int j = 0; j < inputLineCountTrain; j++) {
+            Visuals.progress(j, "Training the set:");
+            nodesInstance.updateInputs(inputTrain.getLine());
+            nodesInstance.updateTargets(inputTarget.getLine());
+            train(nodesInstance.nodes);
           }
         } else {
           throw new Exception("Input and target csv length mismatch!");
         }
       }
 
-      // prints results (output of output Nodes)
-      Visuals.printResult(nodesInstance.nodes[netDepth - 1]);
+      System.out.println("\n");
+      System.out.println("Starting testing:");
+
+      Input inputTest = new Input(inputPathTest, inputLineCountTest, Input.InputType.InputTest);
+
+      // testing
+      if (inputLineCountTest == targetLineCountTest) {
+        for (int i = 0; i < inputLineCountTest; i++) {
+          nodesInstance.updateInputs(inputTest.getLine());
+          think(nodesInstance.nodes);
+
+          Visuals.printResult(nodesInstance.nodes[netDepth - 1]);
+        }
+      }
 
     } catch (Exception ex) {
       ex.printStackTrace();
     }
   }
 
+
+  private static void train(Node[][] nodes) {
+    think(nodes);
+    backpropagate(nodes);
+  }
 
   private static void think(Node[][] nodes) {
     // clears all inputs before thinking again
@@ -70,7 +97,9 @@ public class App {
         }
       }
     }
+  }
 
+  private static void backpropagate(Node[][] nodes) {
     for (Node[] nodes1:nodes) {
       for (Node node:nodes1) {
         // only backpropagate hidden- and output-nodes
@@ -79,6 +108,5 @@ public class App {
         }
       }
     }
-
   }
 }

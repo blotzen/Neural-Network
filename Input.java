@@ -3,17 +3,15 @@ import java.io.FileReader;
 
 public class Input {
 
-  private final String path;
   private final int totalLineCount;
-  private final int divisor;
+  private final InputType type;
   private int currentReadLine = 0;
   private String[][] inputsStrings;
   private double[][] inputsDoubles;
 
-  public Input(final String path, final int totalLineCount, final int divisor) throws Exception {
-    this.path = path;
+  public Input(final String path, final int totalLineCount, final InputType type) throws Exception {
     this.totalLineCount = totalLineCount;
-    this.divisor = divisor;
+    this.type = type;
 
     inputsStrings = readCSV(path, 0, totalLineCount);
     inputsDoubles = stringToDouble(inputsStrings);
@@ -28,9 +26,9 @@ public class Input {
 
   // startLineIndex for possible later extension of the function
   private String[][] readCSV(final String path, final int startLineIndex, final int totalLineCount) throws Exception {
-    BufferedReader br = null;
+    BufferedReader br;
     String[][] inputLines = new String[totalLineCount][];
-    String line = "";
+    String line;
     String csvSplitBy = ",";
 
     br = new BufferedReader(new FileReader(path));
@@ -51,10 +49,23 @@ public class Input {
     double[][] doubles = new double[stringArray.length][stringArray[0].length];
     for (int i = 0; i < stringArray.length; i++) {
       for (int j = 0; j < stringArray[0].length; j++) {
-        doubles[i][j] = Double.parseDouble(stringArray[i][j]) / divisor;
+        if (type == InputType.InputTrain || type == InputType.InputTest) {
+          doubles[i][j] = Double.parseDouble(stringArray[i][j]) / 255.0 * 0.99 + 0.01;
+        } else {
+          double currentNum = Double.parseDouble(stringArray[i][j]);
+          if (currentNum == 0.0D) {
+            doubles[i][j] = 0.01D;
+          } else {
+            doubles[i][j] = currentNum - 0.01D;
+          }
+        }
       }
     }
     return doubles;
+  }
+
+  public enum InputType {
+    InputTrain, TargetTrain, InputTest
   }
 
 }

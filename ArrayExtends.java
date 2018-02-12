@@ -1,18 +1,17 @@
 public class ArrayExtends {
 
-  // returns index of biggest value, if biggest value is a duplicate, first occurrence is returned
-  public static int getIndexOfBiggestValue(final double[] array) {
-
+  public static int indexOfBiggestValue(double[] values) {
     double biggestValue = 0.0D;
     int biggestValueIndex = 0;
 
-    for (int i = 0; i < array.length; i++) {
-      if (array[i] > biggestValue) {
-        biggestValue = array[i];
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] > biggestValue) {
+        biggestValue = values[i];
         biggestValueIndex = i;
       }
     }
 
     return biggestValueIndex;
   }
+
 }

@@ -17,9 +17,22 @@ public class Visuals {
 
 
   public static void printResult(Node[] nodes) {
-    for (Node node:nodes) {
-      System.out.printf("Output: %s%n", node.getOutput());
+
+    double[] outputs = new double[nodes.length];
+
+    for (int i = 0; i < nodes.length; i++) {
+      outputs[i] = nodes[i].getOutput();
     }
+
+    System.out.println("Result: " + (ArrayExtends.indexOfBiggestValue(outputs)));
+  }
+
+  public static void progress(int current, String msg) {
+    try {
+      String anim= "|/-\\";
+      String data = "\r" + msg + " " + anim.charAt(current % anim.length()) + " " + current;
+      System.out.print(data);
+    } catch (Exception ex) { }
   }
 
 }
